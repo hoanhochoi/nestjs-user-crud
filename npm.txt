@@ -1,0 +1,20 @@
+# nếu chưa tạo nest cli chạy lệnh này
+npm i -g @nestjs/cli
+
+# tạo project
+nest new name_project
+
+# vào project
+cd name_project
+
+# hot reload
+npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack 
+
+# Cài đặt TypeORM và Driver cho PostgreSQL
+npm install @nestjs/typeorm typeorm pg
+
+# tạo nhanh cấu trúc CRUD users
+nest g resource users
+
+# cài đặt quản lý cấu hình
+npm i @nestjs/config
