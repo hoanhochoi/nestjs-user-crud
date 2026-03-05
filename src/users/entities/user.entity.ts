@@ -13,4 +13,10 @@ export class User {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({unique: true})  // email không được trùng lặp ở tầng db
+  email: string;
+
+  @Column({nullable: true})
+  password: string;
 }

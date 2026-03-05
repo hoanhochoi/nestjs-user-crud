@@ -1,40 +1,59 @@
-import { Controller, Get, Post, Body, Patch,Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch,Put, Param, Delete, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { updateStatusDto } from './dto/update-status.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
+import { ResponseData } from 'src/global/globalClass';
+import { HttpStatus,HttpMessage } from 'src/global/globalEnum';
+import { UserResponseDto } from './dto/user-response.dto';
+import { promises } from 'dns';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    // try {
+    //   const newUser = await this.usersService.create(createUserDto);
+    //   return new ResponseData<CreateUserDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
+    // } catch (error) {
+    //   const message = error.response?.message || error.message || HttpMessage.ERROR;
+    //   const status = error.status || HttpStatus.ERROR
+
+    //   return new ResponseData<null>(null,message,status);
+    // }
+    const newUser = await this.usersService.create(createUserDto);
+    return new ResponseData<CreateUserDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(): Promise<ResponseData<UserResponseDto[]>> {
+    let users = await this.usersService.findAll();
+    return new ResponseData<UserResponseDto[]>(users,HttpStatus.SUCCESS,HttpMessage.SUCCESS);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ResponseData<UserResponseDto>> {
+    const user = await this.usersService.findOne(+id);
+    return new ResponseData<UserResponseDto>(user,HttpStatus.SUCCESS,HttpMessage.SUCCESS);  // +1 để ép kiểu number vì lấy ở Param là string
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<ResponseData<UserResponseDto>> {
+    const updatedUser =await this.usersService.update(+id,updateUserDto);
+    return new ResponseData<UserResponseDto>(updatedUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS);
   }
 
   @Patch(':id')
-  updateStatus(@Param('id') id: string, @Body() statusDto: updateStatusDto) {
-    return this.usersService.updateStatus(+id, statusDto);
+  async updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateStatusDto) {
+    const updatedUser =await this.usersService.updateStatus(+id,updateStatusDto);
+    return new ResponseData<UserResponseDto>(updatedUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const result = await this.usersService.remove(+id)
+    return new ResponseData(result,HttpStatus.SUCCESS,HttpMessage.SUCCESS);
   }
 }

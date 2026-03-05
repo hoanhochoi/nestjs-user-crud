@@ -1,3 +1,3 @@
-export class updateStatusDto{
+export class UpdateStatusDto{
     isActive: boolean;
 }
