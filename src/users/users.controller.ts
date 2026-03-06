@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch,Put, Param, Delete, } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch,Put, Param, Delete, UseGuards, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,8 +6,9 @@ import { UpdateStatusDto } from './dto/update-status.dto';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpStatus,HttpMessage } from 'src/global/globalEnum';
 import { UserResponseDto } from './dto/user-response.dto';
-import { promises } from 'dns';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -34,7 +35,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ResponseData<UserResponseDto>> {
+  async findOne(@Param('id') id: string,): Promise<ResponseData<UserResponseDto>> {
     const user = await this.usersService.findOne(+id);
     return new ResponseData<UserResponseDto>(user,HttpStatus.SUCCESS,HttpMessage.SUCCESS);  // +1 để ép kiểu number vì lấy ở Param là string
   }

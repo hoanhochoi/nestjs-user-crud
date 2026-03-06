@@ -5,7 +5,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { ResponseData } from 'src/global/globalClass';
-import { updateStatusDto } from './dto/update-status.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -56,6 +56,11 @@ export class UsersService {
     return new UserResponseDto(user.id,user.firstName,user.lastName,user.email,user.isActive);
   }
 
+
+  async findByEmail(email: string) : Promise<User | null>{
+    return this.usersRepository.findOne({where: {email}});
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
     const user = await this.usersRepository.findOne({where:{ id }});
     if(!user){
@@ -70,7 +75,7 @@ export class UsersService {
     return new UserResponseDto(updatedUser.id,updatedUser.firstName,updatedUser.lastName,updatedUser.email,updatedUser.isActive);
   }
 
-  async updateStatus(id: number, updateStatusDto: updateStatusDto) {
+  async updateStatus(id: number, updateStatusDto: UpdateStatusDto) {
    const user = await this.usersRepository.findOne({where:{ id }});
     if(!user){
       throw new NotFoundException("user không tồn tại!");

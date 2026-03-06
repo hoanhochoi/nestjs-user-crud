@@ -21,3 +21,11 @@ npm i @nestjs/config
 
 # thư viện xác thực trường dữ liệu isBlank, isEmail...
 npm install class-validator class-transformer
+
+# tạo module auth
+nest g module auth
+nest g service auth
+nest g controller auth
+
+#cài jwt
+npm install --save @nestjs/jwt
