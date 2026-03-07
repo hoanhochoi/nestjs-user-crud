@@ -6,9 +6,11 @@ import { UpdateStatusDto } from './dto/update-status.dto';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpStatus,HttpMessage } from 'src/global/globalEnum';
 import { UserResponseDto } from './dto/user-response.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard} from 'src/common/guards/auth.guard';
 
-@UseGuards(AuthGuard)
+import { Public } from 'src/common/decorators/public.decorator';
+
+// @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
