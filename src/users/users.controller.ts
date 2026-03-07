@@ -9,6 +9,8 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { AuthGuard} from 'src/common/guards/auth.guard';
 
 import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '../enums/user-role';
 
 // @UseGuards(AuthGuard)
 @Controller('users')
@@ -29,7 +31,7 @@ export class UsersController {
     const newUser = await this.usersService.create(createUserDto);
     return new ResponseData<CreateUserDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }
-
+  @Roles(Role.Admin)
   @Get()
   async findAll(): Promise<ResponseData<UserResponseDto[]>> {
     let users = await this.usersService.findAll();

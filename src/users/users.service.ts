@@ -43,7 +43,7 @@ export class UsersService {
     if(users.length === 0){
       throw new NotFoundException("không tồn tại user nào!");
     }
-    return users.map(user => new UserResponseDto(user.id,user.firstName,user.lastName,user.email,user.isActive));
+    return users.map(user => new UserResponseDto(user.id,user.firstName,user.lastName,user.email,user.isActive,user.roles));
   }
 
   async findOne(id: number){
@@ -53,7 +53,7 @@ export class UsersService {
     if(!user){
       throw new NotFoundException("user không tồn tại!");
     }
-    return new UserResponseDto(user.id,user.firstName,user.lastName,user.email,user.isActive);
+    return new UserResponseDto(user.id,user.firstName,user.lastName,user.email,user.isActive,user.roles);
   }
 
 
@@ -72,7 +72,7 @@ export class UsersService {
       ...user,
       ...updateUserDto, // key phía sau sẽ ghi dè key phía trước
     })
-    return new UserResponseDto(updatedUser.id,updatedUser.firstName,updatedUser.lastName,updatedUser.email,updatedUser.isActive);
+    return new UserResponseDto(updatedUser.id,updatedUser.firstName,updatedUser.lastName,updatedUser.email,updatedUser.isActive,updatedUser.roles);
   }
 
   async updateStatus(id: number, updateStatusDto: UpdateStatusDto) {
@@ -86,7 +86,7 @@ export class UsersService {
       ...user,
       ...updateStatusDto, // key phía sau sẽ ghi dè key phía trước
     })
-    return new UserResponseDto(updatedUser.id,updatedUser.firstName,updatedUser.lastName,updatedUser.email,updatedUser.isActive);
+    return new UserResponseDto(updatedUser.id,updatedUser.firstName,updatedUser.lastName,updatedUser.email,updatedUser.isActive,updatedUser.roles);
   }
 
   async remove(id: number) {

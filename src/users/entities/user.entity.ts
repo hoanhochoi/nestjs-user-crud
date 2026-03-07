@@ -1,3 +1,4 @@
+import { Role } from '../../enums/user-role'
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -19,4 +20,11 @@ export class User {
 
   @Column({nullable: true})
   password: string;
+
+  @Column({
+      type: 'enum',
+      enum: Role,
+      default: Role.User
+    })
+  roles: Role;
 }
