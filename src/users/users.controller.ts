@@ -50,6 +50,7 @@ export class UsersController {
     return new ResponseData<UserResponseDto>(updatedUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS);
   }
 
+  @Roles(Role.Editor, Role.Admin)
   @Patch(':id')
   async updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateStatusDto) {
     const updatedUser =await this.usersService.updateStatus(+id,updateStatusDto);

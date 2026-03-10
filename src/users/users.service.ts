@@ -58,7 +58,10 @@ export class UsersService {
 
 
   async findByEmail(email: string) : Promise<User | null>{
-    return this.usersRepository.findOne({where: {email}});
+    return this.usersRepository.findOne(
+      {where: {email},
+      relations: ['roles']
+    });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {

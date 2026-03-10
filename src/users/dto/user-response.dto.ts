@@ -1,4 +1,4 @@
-import { Role } from "src/enums/user-role";
+import { Role } from "src/roles/role.entity";
 
 export class UserResponseDto{
     id: number;
@@ -6,9 +6,9 @@ export class UserResponseDto{
     lastName: string;
     email: string;
     isActive: boolean;
-    roles: Role
+    roles: Role[]
 
-    constructor(id:number, firstName:string, lastName:string,email: string, isActive: boolean, roles: Role){
+    constructor(id:number, firstName:string, lastName:string,email: string, isActive: boolean, roles: Role[]){
        this.id = id;
        this.firstName = firstName;
        this.lastName = lastName;

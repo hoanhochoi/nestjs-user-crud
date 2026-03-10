@@ -15,13 +15,16 @@ export class AuthService {
     pass: string,
   ): Promise<{ access_token: string }> {
     const user = await this.usersService.findByEmail(username);
+    console.log(user);
     if (user?.password !== pass) {
       throw new UnauthorizedException();
     }
     const payload = {
       sub: user.id,
       username: user.email,
-      roles: user.roles ,// lấy thêm role
+      // roles: user.roles ,// lấy thêm role
+
+      roles: user.roles.map(role => role.name)
     };
     console.log(payload);
     return {
