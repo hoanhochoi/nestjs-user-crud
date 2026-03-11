@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateUserDto {
 
@@ -17,4 +17,8 @@ export class CreateUserDto {
     @IsString()
     @IsNotEmpty({message: "password không được để trống!"})
     password: string;
+
+    @IsOptional() // có thể là không gửi role
+    @IsArray()
+    role:string[];
 }

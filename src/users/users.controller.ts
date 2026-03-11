@@ -28,8 +28,10 @@ export class UsersController {
 
     //   return new ResponseData<null>(null,message,status);
     // }
+
+
     const newUser = await this.usersService.create(createUserDto);
-    return new ResponseData<CreateUserDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
+    return new ResponseData<UserResponseDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }
   @Roles(Role.Admin)
   @Get()
