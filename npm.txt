@@ -29,3 +29,21 @@ nest g controller auth
 
 #cài jwt
 npm install --save @nestjs/jwt
+
+
+
+#package.json
+"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch", => dùng cái này nhanh nhưng khó cho docker
+"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch", => dùng cái này phổ biến chậm hơn nhưng ổn định docker
+
+# lấy file backup từ pg local
+pg_dump -U postgres -d user_crud > backup.sql
+
+# import vào trong docker
+docker exec -i nestjs-db psql -U postgres -d user_crud < backup.sql
+
+#import dữ liệu vào docker
+Get-Content backup.sql | docker exec -i nestjs-db psql -U postgres -d user_crud
+
+# vào pg docker để kiểm tra dữ liệu
+docker exec -it nestjs-db psql -U postgres -d user_crud

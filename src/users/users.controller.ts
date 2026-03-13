@@ -17,6 +17,7 @@ import { Role } from '../enums/user-role';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     // try {
@@ -33,6 +34,7 @@ export class UsersController {
     const newUser = await this.usersService.create(createUserDto);
     return new ResponseData<UserResponseDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }
+
   @Roles(Role.Admin)
   @Get()
   async findAll(): Promise<ResponseData<UserResponseDto[]>> {
