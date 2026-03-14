@@ -104,7 +104,7 @@ services:
       POSTGRES_USER: '${POSTGRES_USER:-postgres}'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql   # không dùng thêm /data vì postgres: 18-alpine
     ports:
       - '${DB_PORT:-5432}:5432'
     restart: unless-stopped
@@ -122,8 +122,9 @@ services:
 # ========================================
 volumes:
   postgres_data:
-    name: nestjs-postgres-data
-    driver: local
+    external: true # cần khai báo volume thủ công khi dùng external: true (docker volume create nestjs-postgres-data)
+    name: nestjs-postgres-data 
+    # driver: local # không cần khai báo khi external, vì driver mặc định là local
 
 # ========================================
 # Network Configuration
