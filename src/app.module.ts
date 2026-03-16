@@ -6,10 +6,25 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // 2. Để ConfigModule chạy toàn cầu
+    
+      CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      isGlobal: true, // để cache module có thể sử dụng ở bất kỳ đâu
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get<string>('REDIS_HOST', 'localhost'),
+        port: configService.get<number>('REDIS_PORT', 6379),
+        ttl: 60, // 1 phút (giây)
+      }),
+    }),
+
     TypeOrmModule.forRootAsync({              // 3. Dùng forRootAsync thay vì forRoot
       imports: [ConfigModule],
       inject: [ConfigService],

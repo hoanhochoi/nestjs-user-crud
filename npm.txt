@@ -30,6 +30,10 @@ nest g controller auth
 #cài jwt
 npm install --save @nestjs/jwt
 
+# cài cache
+npm install @nestjs/cache-manager cache-manager cache-manager-redis-store
+npm install redis --save
+
 
 
 #package.json

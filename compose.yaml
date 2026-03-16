@@ -33,6 +33,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     develop:
       watch:
         - action: sync
@@ -64,13 +66,8 @@ services:
 
     environment:
       NODE_ENV: production
-      JWT_SECRET: mySuperSecretKey123456
-    #   POSTGRES_HOST: db
-    #   POSTGRES_PORT: 5432
-    #   POSTGRES_DB: user_crud
-    #   POSTGRES_USER: postgres
-    #   POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
-  
+      JWT_SECRET: '${JWT_SECRET:-supersecretkeyjwt}'
+    
     depends_on:
       db:
         condition: service_healthy
@@ -116,15 +113,35 @@ services:
       start_period: 5s
     networks:
       - nestjs-network
+  
+  redis:
+    image: redis:7-alpine
+    container_name: nestjs-redis
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - nestjs-network
+    command: ["redis-server", "--appendonly", "yes"] # bật chế độ lưu dữ liệu bền vững
+    volumes:
+      - redis_data:/data
 
 # ========================================
 # Volume Configuration
 # ========================================
 volumes:
   postgres_data:
-    external: true # cần khai báo volume thủ công khi dùng external: true (docker volume create nestjs-postgres-data)
     name: nestjs-postgres-data 
-    # driver: local # không cần khai báo khi external, vì driver mặc định là local
+    driver: local
+  redis_data:
+    name: nestjs-redis-data
+    driver: local
 
 # ========================================
 # Network Configuration
