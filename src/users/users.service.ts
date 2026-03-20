@@ -10,6 +10,7 @@ import { Role } from 'src/roles/role.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { type Cache } from 'cache-manager';
 import { Inject } from '@nestjs/common';
+import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService {
@@ -22,10 +23,14 @@ export class UsersService {
 
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
+
+    @Inject('RABBITMQ_SERVICE')
+    private readonly client: ClientProxy,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
     try {
+      // 1. logic lưu user vào postgres
       const { role, ...userData } = createUserDto;
       const roles = role && role.length > 0 ? role : ['USER'];
 
@@ -36,11 +41,35 @@ export class UsersService {
       if (roles.length !== roleEntities.length)
         throw new BadRequestException('Role không tồn tại trong hệ thống!'); // BadRequestException dùng khi dữ liệu truyền vào sai
 
-      const newUser = this.usersRepository.create({
+      const newUser = await this.usersRepository.create({
         ...userData,
         roles: roleEntities
       });
-      return await this.usersRepository.save(newUser);
+      const userResponse = await this.usersRepository.save(newUser)
+      // 2. chuẩn bị tin nhắn để gửi san Microservice khác
+      const message = { email: newUser.email, userName: newUser.firstName };
+      const record = new RmqRecordBuilder(message)
+        .setOptions({
+          headers: {
+            ['x-version']: '1.0.0',
+          },
+          priority: 3,
+        })
+        .build();
+      // 3. Gửi tin nhắn
+      // Dùng .send() nếu muốn đợi phản hồi ("rabbitmq" từ controller kia)
+      // Dùng .emit() nếu chỉ muốn gửi đi và mặc kệ kết quả
+      try {
+        this.client.emit ('create_user', record) // dùng emit không cần .subcribe
+        // .subscribe(result => {
+        // console.log("phản hồi từ microservice:" + result);
+      // }
+    // );
+      } catch (error) {
+        console.log("không nhận được phản hồi từ microservice:" + error.message);
+      }
+
+      return userResponse;
     } catch (error) {
       if (error.code === '23505') { // PostgreSQL duplicate key
         throw new ConflictException("email đã tồn tại!");
@@ -93,16 +122,16 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     const cacheKey = `user_email_${email}`;
     const cachedUser = await this.cacheManager.get<User>(cacheKey);
-    if(cachedUser)
+    if (cachedUser)
       return cachedUser;
-     const userResponse = this.usersRepository.findOne(
+    const userResponse = this.usersRepository.findOne(
       {
         where: { email },
         relations: ['roles']
       });
-      await this.cacheManager.set(cacheKey,userResponse, 600000);
+    await this.cacheManager.set(cacheKey, userResponse, 600000);
 
-      return userResponse;
+    return userResponse;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {

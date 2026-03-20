@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import * as redisStore from 'cache-manager-redis-store';
     UsersModule,
     AuthModule,
     RolesModule,
+    RabbitmqModule,
   ],
   controllers: [AppController],
   providers: [AppService],

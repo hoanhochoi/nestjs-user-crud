@@ -34,7 +34,8 @@ npm install --save @nestjs/jwt
 npm install @nestjs/cache-manager cache-manager cache-manager-redis-store
 npm install redis --save
 
-
+# cài microservices và thư viện kết nối RabbitMQ và thư viện tự động kết nối lại nếu RabbitMQ bị ngắt quãng
+npm install @nestjs/microservices amqplib amqp-connection-manager
 
 #package.json
 "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch", => dùng cái này nhanh nhưng khó cho docker

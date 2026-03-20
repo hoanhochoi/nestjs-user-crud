@@ -114,6 +114,9 @@ services:
     networks:
       - nestjs-network
   
+  # ========================================
+  # Redis Service
+  # ========================================
   redis:
     image: redis:7-alpine
     container_name: nestjs-redis
@@ -132,6 +135,29 @@ services:
     volumes:
       - redis_data:/data
 
+  # ========================================
+  # RabbitMQ Service
+  # ========================================
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: nestjs-rabbitmq
+    ports:
+      - '${RABBITMQ_PORT:-5672}:5672'     # API port
+      - '${RABBITMQ_MANAGEMENT:-15672}:15672'  # Web UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: '${RABBITMQ_USER:-guest}'
+      RABBITMQ_DEFAULT_PASS: '${RABBITMQ_PASS:-guest}'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - nestjs-network
+
 # ========================================
 # Volume Configuration
 # ========================================
@@ -141,6 +167,9 @@ volumes:
     driver: local
   redis_data:
     name: nestjs-redis-data
+    driver: local
+  rabbitmq_data:
+    name: nestjs-rabbitmq-data
     driver: local
 
 # ========================================

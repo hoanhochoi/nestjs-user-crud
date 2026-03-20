@@ -11,11 +11,37 @@ import { AuthGuard} from 'src/common/guards/auth.guard';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '../enums/user-role';
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 
 // @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  // @MessagePattern('notifications')
+  // getNotifications(@Payload() data: number[], @Ctx() context: RmqContext){
+  //   console.log(`Pattern:${context.getPattern()}`);
+  //   console.log("getMessage:"+context.getMessage());
+  //   console.log("getChannelRef:"+context.getChannelRef());
+
+  // const channel = context.getChannelRef();
+  // const originalMsg = context.getMessage();
+
+  // channel.ack(originalMsg); // xác nhận là đã xử lý xong thành công để xóa nó ra khỏi queue
+  //   return "rabbitMQ";
+  // } // => dùng khi phía bên kia là send
+
+  @EventPattern("create_user")
+  handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext){
+    // console.log(`Pattern:${context.getPattern()}`);
+    console.log("getMessage:",context.getMessage());
+    console.log("getChannelRef:",context.getChannelRef());
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+    console.log("tôi đã nhận được tin nhắn rabbitmq",data);
+    channel.ack(originalMsg); // để xác nhận và xóa trong queue
+  }
+
 
   @Public()
   @Post()
