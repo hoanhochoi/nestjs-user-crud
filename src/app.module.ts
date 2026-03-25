@@ -7,9 +7,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
+import KeyvRedis from '@keyv/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
+
 
 @Module({
   imports: [
@@ -19,12 +20,14 @@ import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       isGlobal: true, // để cache module có thể sử dụng ở bất kỳ đâu
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get<string>('REDIS_HOST', 'localhost'),
-        port: configService.get<number>('REDIS_PORT', 6379),
-        ttl: 60, // 1 phút (giây)
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const host = configService.get('REDIS_HOST','localhost');
+        const port = configService.get('REDIS_PORT',6379);
+        return {
+          stores: new KeyvRedis(`redis://${host}:${port}`),
+          ttl: 60000,// 1 phút
+        }
+      }
     }),
 
     TypeOrmModule.forRootAsync({              // 3. Dùng forRootAsync thay vì forRoot
