@@ -12,6 +12,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
 
 @Module({
   imports: [
@@ -74,7 +75,8 @@ import { APP_GUARD } from '@nestjs/core';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard // cấu hình giới hạn toàn bộ các api
+      // useClass: ThrottlerGuard // cấu hình giới hạn toàn bộ các api
+      useClass: ThrottlerCustomGuard 
     }
   ],
 })
