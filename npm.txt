@@ -41,6 +41,9 @@ npm install @nestjs/microservices amqplib amqp-connection-manager
 "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch", => dùng cái này nhanh nhưng khó cho docker
 "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch", => dùng cái này phổ biến chậm hơn nhưng ổn định docker
 
+// rate limiting 
+npm i --save @nestjs/throttler
+
 # lấy file backup từ pg local
 pg_dump -U postgres -d user_crud > backup.sql
 

@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -19,7 +20,10 @@ export class AuthController {
     @Public()
     @HttpCode(HttpStatus.OK)
     @Post('login')
+    // @Throttle({ default: { limit: 3, ttl: 60000 } })
     signIn(@Body() signInDto: Record<string, any>) {
+        console.log("userName:"+signInDto.username);
+        console.log("password:"+signInDto.password);
         return this.authService.signIn(signInDto.username, signInDto.password);
     }
 

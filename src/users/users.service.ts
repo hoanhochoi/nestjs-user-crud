@@ -124,7 +124,7 @@ export class UsersService {
     const cachedUser = await this.cacheManager.get<User>(cacheKey);
     if (cachedUser)
       return cachedUser;
-    const userResponse = this.usersRepository.findOne(
+    const userResponse = await this.usersRepository.findOne(
       {
         where: { email },
         relations: ['roles']

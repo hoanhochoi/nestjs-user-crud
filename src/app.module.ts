@@ -10,7 +10,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
-
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -29,6 +29,18 @@ import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
         }
       }
     }),
+
+    // rate limiting
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000, //60s
+          limit: 10,
+        },
+        
+      ],
+    }),
+    
 
     TypeOrmModule.forRootAsync({              // 3. Dùng forRootAsync thay vì forRoot
       imports: [ConfigModule],
