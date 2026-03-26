@@ -10,19 +10,20 @@ import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // 2. Để ConfigModule chạy toàn cầu
-    
-      CacheModule.registerAsync({
+
+    CacheModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       isGlobal: true, // để cache module có thể sử dụng ở bất kỳ đâu
       useFactory: async (configService: ConfigService) => {
-        const host = configService.get('REDIS_HOST','localhost');
-        const port = configService.get('REDIS_PORT',6379);
+        const host = configService.get('REDIS_HOST', 'localhost');
+        const port = configService.get('REDIS_PORT', 6379);
         return {
           stores: new KeyvRedis(`redis://${host}:${port}`),
           ttl: 60000,// 1 phút
@@ -35,12 +36,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
       throttlers: [
         {
           ttl: 60000, //60s
-          limit: 10,
+          limit: 1000, // 1000/1p
         },
-        
+
       ],
     }),
-    
+
 
     TypeOrmModule.forRootAsync({              // 3. Dùng forRootAsync thay vì forRoot
       imports: [ConfigModule],
@@ -69,6 +70,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
     RabbitmqModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard // cấu hình giới hạn toàn bộ các api
+    }
+  ],
 })
-export class AppModule {}
+export class AppModule { }

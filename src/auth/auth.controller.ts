@@ -20,7 +20,7 @@ export class AuthController {
     @Public()
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    // @Throttle({ default: { limit: 3, ttl: 60000 } })
+    @Throttle({ default: { limit: 3, ttl: 60000 } }) // ghi đè lên riêng login 3 lần/1p
     signIn(@Body() signInDto: Record<string, any>) {
         console.log("userName:"+signInDto.username);
         console.log("password:"+signInDto.password);
