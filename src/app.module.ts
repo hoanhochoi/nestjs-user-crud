@@ -10,9 +10,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import Redis from 'ioredis';
 
 @Module({
   imports: [
@@ -33,14 +35,21 @@ import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
     }),
 
     // rate limiting
-    ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 60000, //60s
-          limit: 1000, // 1000/1p
-        },
-
-      ],
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: config.get('THROTTLE_TTL') || 60000, // 60s
+            limit: config.get('THROTTLE_LIMIT') || 5, // 5 lần/1 phút
+          },
+        ],
+        storage: new ThrottlerStorageRedisService({
+          host: config.get('REDIS_HOST', 'localhost'),
+          port: config.get('REDIS_PORT', 6379)
+        }),
+      }),
     }),
 
 
@@ -76,7 +85,7 @@ import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
     {
       provide: APP_GUARD,
       // useClass: ThrottlerGuard // cấu hình giới hạn toàn bộ các api
-      useClass: ThrottlerCustomGuard 
+      useClass: ThrottlerCustomGuard
     }
   ],
 })

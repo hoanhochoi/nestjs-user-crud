@@ -43,6 +43,8 @@ npm install @nestjs/microservices amqplib amqp-connection-manager
 
 // rate limiting 
 npm i --save @nestjs/throttler
+// kết hợp với redis
+npm install --save @nest-lab/throttler-storage-redis ioredis
 
 # lấy file backup từ pg local
 pg_dump -U postgres -d user_crud > backup.sql
