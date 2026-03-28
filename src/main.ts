@@ -8,7 +8,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   // 1. khởi tạo ứng dụng web bình thường(HTTP)
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.set('trust proxy', 'loopback');
+  app.set('trust proxy', 'loopback'); // để phân biệt ip 
 
   // 2. gắn thêm RabbitMQ vào ứng dụng hiện tại
   app.connectMicroservice<MicroserviceOptions>({

@@ -1,20 +1,19 @@
+import KeyvRedis from '@keyv/redis';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/roles.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
-import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
-import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
-import Redis from 'ioredis';
+import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
+import { RolesModule } from './roles/roles.module';
+import { UsersModule } from './users/users.module';
+// import { LoginThrottlerService } from './common/services/login-throttler.service';
 
 @Module({
   imports: [
@@ -82,6 +81,7 @@ import Redis from 'ioredis';
   controllers: [AppController],
   providers: [
     AppService,
+    // LoginThrottlerService,
     {
       provide: APP_GUARD,
       // useClass: ThrottlerGuard // cấu hình giới hạn toàn bộ các api

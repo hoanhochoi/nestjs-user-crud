@@ -1,12 +1,14 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthGuard } from '../common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { UsersModule } from '../users/users.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { LoginThrottlerService } from 'src/common/services/login-throttler.service';
+import { LoginThrottlerModule } from 'src/common/services/login-throttler.module';
 
 // @Module({
 //   imports: [
@@ -23,6 +25,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 //   exports: [AuthService],
 // }) lỗi không lấy được file env
 
+
 @Module({
   imports: [
     // UsersModule, // authModule -> userModule và bên kia userModule cũng gọi lại sinh vòng tròn và lỗi
@@ -37,6 +40,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
         signOptions: { expiresIn: '1h' },
       }),
     }),
+    LoginThrottlerModule
   ],
   providers: [AuthService,AuthGuard,
     {
@@ -46,7 +50,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
      {
     provide: APP_GUARD,
     useClass: RolesGuard,
-    }
+    },
 
   ],
   controllers: [AuthController],
