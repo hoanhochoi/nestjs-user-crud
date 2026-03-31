@@ -18,19 +18,6 @@ import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @MessagePattern('notifications')
-  // getNotifications(@Payload() data: number[], @Ctx() context: RmqContext){
-  //   console.log(`Pattern:${context.getPattern()}`);
-  //   console.log("getMessage:"+context.getMessage());
-  //   console.log("getChannelRef:"+context.getChannelRef());
-
-  // const channel = context.getChannelRef();
-  // const originalMsg = context.getMessage();
-
-  // channel.ack(originalMsg); // xác nhận là đã xử lý xong thành công để xóa nó ra khỏi queue
-  //   return "rabbitMQ";
-  // } // => dùng khi phía bên kia là send
-
   @EventPattern("create_user")
   handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext){
     // console.log(`Pattern:${context.getPattern()}`);
@@ -46,17 +33,6 @@ export class UsersController {
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    // try {
-    //   const newUser = await this.usersService.create(createUserDto);
-    //   return new ResponseData<CreateUserDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
-    // } catch (error) {
-    //   const message = error.response?.message || error.message || HttpMessage.ERROR;
-    //   const status = error.status || HttpStatus.ERROR
-
-    //   return new ResponseData<null>(null,message,status);
-    // }
-
-
     const newUser = await this.usersService.create(createUserDto);
     return new ResponseData<UserResponseDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }

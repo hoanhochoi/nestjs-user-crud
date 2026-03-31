@@ -1,6 +1,7 @@
 // import { Role } from '../../enums/user-role'
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Role } from 'src/roles/role.entity';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -22,12 +23,22 @@ export class User {
   @Column({nullable: true})
   password: string;
 
-  // @Column({
-  //     type: 'enum',
-  //     enum: Role,
-  //     default: Role.User
-  //   })
-  // roles: Role;
+  @BeforeInsert()
+  async hashPassword(){
+    this.password = await bcrypt.hash(this.password,10);
+  }
+
+  @BeforeUpdate()
+  async updatePassword(){
+    const isAlreadyHashed = this.password.startsWith("$2b$");
+    if(!isAlreadyHashed){
+      this.password = await bcrypt.hash(this.password,10);
+    }
+  }
+
+  async validationPassword(password: string): Promise<boolean>{
+    return await bcrypt.compare(this.password,this.password)
+  }
 
   @ManyToMany(()=>  Role, (role)=> role.users)
   @JoinTable({ // chú ý là JoinTable và chỉ 1 bên có thôi

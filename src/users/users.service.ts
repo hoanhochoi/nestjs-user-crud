@@ -1,17 +1,15 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
+import { type Cache } from 'cache-manager';
+import { Role } from 'src/roles/role.entity';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from 'src/roles/role.entity';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { type Cache } from 'cache-manager';
-import { Inject } from '@nestjs/common';
-import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
-import * as bcrypt from 'bcrypt';
+import { UserResponseDto } from './dto/user-response.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +30,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     try {
       // 1. logic lưu user vào postgres
-      const { role, password, ...userData } = createUserDto;
+      const { role, ...userData } = createUserDto;
       const roles = role && role.length > 0 ? role : ['USER'];
 
       const roleEntities = await this.roleRepository.find({
@@ -42,13 +40,13 @@ export class UsersService {
       if (roles.length !== roleEntities.length)
         throw new BadRequestException('Role không tồn tại trong hệ thống!'); // BadRequestException dùng khi dữ liệu truyền vào sai
 
-      const hashPassword = await bcrypt.hash(password, 10);
+      // const hashPassword = await bcrypt.hash(password, 10);
     
 
       const newUser = await this.usersRepository.create({
         ...userData,
         roles: roleEntities,
-        password: hashPassword,
+        // password: hashPassword,
       });
       const userResponse = await this.usersRepository.save(newUser)
       // 2. chuẩn bị tin nhắn để gửi san Microservice khác
