@@ -11,6 +11,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { type Cache } from 'cache-manager';
 import { Inject } from '@nestjs/common';
 import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     try {
       // 1. logic lưu user vào postgres
-      const { role, ...userData } = createUserDto;
+      const { role, password, ...userData } = createUserDto;
       const roles = role && role.length > 0 ? role : ['USER'];
 
       const roleEntities = await this.roleRepository.find({
@@ -41,9 +42,13 @@ export class UsersService {
       if (roles.length !== roleEntities.length)
         throw new BadRequestException('Role không tồn tại trong hệ thống!'); // BadRequestException dùng khi dữ liệu truyền vào sai
 
+      const hashPassword = await bcrypt.hash(password, 10);
+    
+
       const newUser = await this.usersRepository.create({
         ...userData,
-        roles: roleEntities
+        roles: roleEntities,
+        password: hashPassword,
       });
       const userResponse = await this.usersRepository.save(newUser)
       // 2. chuẩn bị tin nhắn để gửi san Microservice khác

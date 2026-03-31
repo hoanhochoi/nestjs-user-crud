@@ -3,6 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginThrottlerService } from 'src/common/services/login-throttler.service';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,24 +18,20 @@ export class AuthService {
     ip: string
   ): Promise<{ access_token: string }> {
     //1. check limit
-    await this.loginThrottler.checkLimit(ip,username);
+    await this.loginThrottler.checkLimit(ip, username);
 
     const user = await this.usersService.findByEmail(username);
 
-    console.log("username:"+username);
-    console.log("password:"+pass)
-
     // 2. check user
-    const isValid = username === user?.email && pass === user.password;
-    console.log("user:"+user);
-    if (!isValid) {
-      await this.loginThrottler.increaseFail(ip,username);
+    const isMatch = user ? await bcrypt.compare(pass, user.password) : false;
+    if (!isMatch || !user ) {
+      await this.loginThrottler.increaseFail(ip, username);
       throw new UnauthorizedException("Sai email hoặc password");
     }
 
     // 3. login thành công thì reset
-    await this.loginThrottler.reset(ip,username);
-    
+    await this.loginThrottler.reset(ip, username);
+
     const payload = {
       sub: user.id,
       username: user.email,
