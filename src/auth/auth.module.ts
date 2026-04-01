@@ -10,22 +10,6 @@ import { AuthService } from './auth.service';
 import { LoginThrottlerService } from 'src/common/services/login-throttler.service';
 import { LoginThrottlerModule } from 'src/common/services/login-throttler.module';
 
-// @Module({
-//   imports: [
-//     UsersModule,
-//     JwtModule.register({
-//       global: true,
-//       // secret: jwtConstants.secret,
-//       secret: process.env.JWT_SECRET,
-//       signOptions: { expiresIn: '60s' },
-//     }),
-//   ],
-//   providers: [AuthService],
-//   controllers: [AuthController],
-//   exports: [AuthService],
-// }) lỗi không lấy được file env
-
-
 @Module({
   imports: [
     // UsersModule, // authModule -> userModule và bên kia userModule cũng gọi lại sinh vòng tròn và lỗi

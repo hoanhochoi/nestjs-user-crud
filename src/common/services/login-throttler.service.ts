@@ -1,7 +1,6 @@
 // src/common/services/login-throttler.service.ts
-import { Inject, Injectable, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { RedisModule } from 'src/redis/redis.module';
 
 @Injectable()
 export class LoginThrottlerService {

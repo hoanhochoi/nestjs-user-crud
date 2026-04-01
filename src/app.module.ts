@@ -13,7 +13,6 @@ import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
-// import { LoginThrottlerService } from './common/services/login-throttler.service';
 
 @Module({
   imports: [
@@ -57,12 +56,6 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        // host: configService.get<string>('DB_HOST'),  // không phải để localhost 
-        // port: configService.get<number>('DB_PORT'),
-        // username: configService.get<string>('DB_USERNAME'),
-        // password: configService.get<string>('DB_PASSWORD'),
-        // database: configService.get<string>('DB_NAME'),
-
         host: configService.get<string>('POSTGRES_HOST'),
         port: configService.get<number>('POSTGRES_PORT'),
         username: configService.get<string>('POSTGRES_USER'),
@@ -81,7 +74,6 @@ import { UsersModule } from './users/users.module';
   controllers: [AppController],
   providers: [
     AppService,
-    // LoginThrottlerService,
     {
       provide: APP_GUARD,
       // useClass: ThrottlerGuard // cấu hình giới hạn toàn bộ các api

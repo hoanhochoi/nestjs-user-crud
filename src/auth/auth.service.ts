@@ -1,9 +1,8 @@
 
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginThrottlerService } from 'src/common/services/login-throttler.service';
-import * as bcrypt from 'bcrypt';
+import { UsersService } from '../users/users.service';
 @Injectable()
 export class AuthService {
   constructor(
@@ -39,7 +38,7 @@ export class AuthService {
 
       roles: user.roles.map(role => role.name)
     };
-    console.log(payload);
+
     return {
       // 💡 Here the JWT secret key that's used for signing the payload 
       // is the key that was passsed in the JwtModule
