@@ -3,6 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginThrottlerService } from 'src/common/services/login-throttler.service';
 import { UsersService } from '../users/users.service';
+import * as bcrypct from 'bcrypt'
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,7 +23,9 @@ export class AuthService {
     const user = await this.usersService.findByEmail(username);
 
     // 2. check user
-    const isMatch = user ? user.validationPassword(pass) : false;
+    // const isMatch = user ? await bcrypct.compare(pass,user.password)  : false;
+    const isMatch = user ? user.validationPassword(pass)  : false;
+
     if (!isMatch || !user ) {
       await this.loginThrottler.increaseFail(ip, username);
       throw new UnauthorizedException("Sai email hoặc password");

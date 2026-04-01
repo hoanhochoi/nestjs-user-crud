@@ -37,7 +37,7 @@ export class User {
   }
 
   async validationPassword(password: string): Promise<boolean>{
-    return await bcrypt.compare(this.password,this.password)
+    return await bcrypt.compare(password,this.password)
   }
 
   @ManyToMany(()=>  Role, (role)=> role.users)

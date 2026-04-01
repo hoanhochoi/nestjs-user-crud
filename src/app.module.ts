@@ -13,6 +13,7 @@ import { ThrottlerCustomGuard } from './common/guards/throttler-custom.guard';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
+import { DomainsModule } from './domains/domains.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     RolesModule,
     RabbitmqModule,
+    DomainsModule,
   ],
   controllers: [AppController],
   providers: [

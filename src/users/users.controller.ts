@@ -33,6 +33,7 @@ export class UsersController {
   @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
+    console.log("đây là tạo user")
     const newUser = await this.usersService.create(createUserDto);
     return new ResponseData<UserResponseDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }
