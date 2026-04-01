@@ -5,11 +5,39 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DomainsService } from './domains/domains.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 async function bootstrap() {
   // 1. khởi tạo ứng dụng web bình thường(HTTP)
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Lấy các service cần thiết từ app context
+  const domainsService = app.get(DomainsService);
+  const cacheManager = app.get(CACHE_MANAGER);
+
   app.enableCors({
-    origin: 'http://localhost:5173', // chỉ cho phép frontend chạy ở port 5173 
+    // origin: 'http://localhost:5173', // chỉ cho phép frontend chạy ở port 5173 
+    origin: async (origin, callback) => {
+      // 1. Cho phép Postman (không có origin)
+      if (!origin) return callback(null, true);
+
+      // 2. Thử lấy từ Redis trước cho nhanh
+      let whiteList: string[] = await cacheManager.get('ALLOWED_DOMAINS');
+
+      // 3. Nếu Redis trống (mới khởi động), lấy từ Postgres nạp vào
+      if (!whiteList) {
+        whiteList = await domainsService.getAllActiveDomains();
+        await cacheManager.set('ALLOWED_DOMAINS', whiteList, 0);
+      }
+
+      // 4. Kiểm tra
+      if (whiteList.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed for this domain'), false);
+      }
+    },
+
     methods: 'GET,POST,PUT,DELETE,PATCH', // chỉ cho phép các lệnh này
     allowedHeaders: 'Content-Type, Authorization, Accept', // chỉ cho phép gửi kèm các header
     credentials: true, // để trình duyệt cho phép gửi cookie
