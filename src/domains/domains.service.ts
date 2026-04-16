@@ -23,7 +23,7 @@ export class DomainsService {
 
     const allActiveDomains = await this.domainRepo.find({where:{isActive:true}});
     const domains = allActiveDomains.map(d => d.domain);
-    await this.cacheManager.set("Allowed_Domain",domains,0);
+    await this.cacheManager.set("ALLOWED_DOMAINS",domains,0);
     return newDomain;
   }
 

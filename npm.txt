@@ -56,4 +56,4 @@ docker exec -i nestjs-db psql -U postgres -d user_crud < backup.sql
 Get-Content backup.sql | docker exec -i nestjs-db psql -U postgres -d user_crud
 
 # vào pg docker để kiểm tra dữ liệu
-docker exec -it nestjs-db psql -U postgres -d user_crud
+docker exec -it nestjs-db psql -U postgres -d user_crud 

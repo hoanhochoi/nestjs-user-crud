@@ -21,9 +21,7 @@ export class LoginThrottlerService {
       this.redis.get(emailKey),
       this.redis.get(ipEmailKey),
     ]);
-    console.log(ipKey);
-    console.log(emailCount);
-    console.log(ipEmailCount)
+ 
     if (
       Number(ipCount) >= 10 ||      // IP limit
       Number(emailCount) >= 5 ||   // Email limit

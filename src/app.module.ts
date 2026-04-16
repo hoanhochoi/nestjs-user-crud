@@ -41,7 +41,7 @@ import { DomainsModule } from './domains/domains.module';
         throttlers: [
           {
             ttl: config.get('THROTTLE_TTL') || 60000, // 60s
-            limit: config.get('THROTTLE_LIMIT') || 5, // 5 lần/1 phút
+            limit: config.get('THROTTLE_LIMIT') || 100, // 100 lần/1 phút
           },
         ],
         storage: new ThrottlerStorageRedisService({

@@ -38,7 +38,7 @@ export class UsersController {
     return new ResponseData<UserResponseDto>(newUser,HttpStatus.SUCCESS,HttpMessage.SUCCESS)
   }
 
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User)
   @Get()
   async findAll(): Promise<ResponseData<UserResponseDto[]>> {
     let users = await this.usersService.findAll();
@@ -51,6 +51,7 @@ export class UsersController {
     return new ResponseData<UserResponseDto>(user,HttpStatus.SUCCESS,HttpMessage.SUCCESS);  // +1 để ép kiểu number vì lấy ở Param là string
   }
 
+  @Roles(Role.Admin)
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<ResponseData<UserResponseDto>> {
     const updatedUser =await this.usersService.update(+id,updateUserDto);

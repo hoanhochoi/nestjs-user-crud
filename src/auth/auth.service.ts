@@ -23,8 +23,8 @@ export class AuthService {
     const user = await this.usersService.findByEmail(username);
 
     // 2. check user
-    // const isMatch = user ? await bcrypct.compare(pass,user.password)  : false;
-    const isMatch = user ? user.validationPassword(pass)  : false;
+    const isMatch = user ? await bcrypct.compare(pass,user.password)  : false;
+    // const isMatch = user ? user.validationPassword(pass)  : false;
 
     if (!isMatch || !user ) {
       await this.loginThrottler.increaseFail(ip, username);
@@ -37,6 +37,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       username: user.email,
+      name: user.firstName,
       // roles: user.roles ,// lấy thêm role
 
       roles: user.roles.map(role => role.name)
