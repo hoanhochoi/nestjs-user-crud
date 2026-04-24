@@ -4,7 +4,7 @@ import { ClientProxy, RmqRecordBuilder } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { type Cache } from 'cache-manager';
 import { Role } from 'src/roles/role.entity';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -41,7 +41,7 @@ export class UsersService {
         throw new BadRequestException('Role không tồn tại trong hệ thống!'); // BadRequestException dùng khi dữ liệu truyền vào sai
 
       // const hashPassword = await bcrypt.hash(password, 10);
-    
+
 
       const newUser = await this.usersRepository.create({
         ...userData,
@@ -63,11 +63,11 @@ export class UsersService {
       // Dùng .send() nếu muốn đợi phản hồi ("rabbitmq" từ controller kia)
       // Dùng .emit() nếu chỉ muốn gửi đi và mặc kệ kết quả
       try {
-        this.client.emit ('create_user', record) // dùng emit không cần .subcribe
+        this.client.emit('create_user', record) // dùng emit không cần .subcribe
         // .subscribe(result => {
         // console.log("phản hồi từ microservice:" + result);
-      // }
-    // );
+        // }
+        // );
       } catch (error) {
         console.log("không nhận được phản hồi từ microservice:" + error.message);
       }
@@ -81,10 +81,20 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<UserResponseDto[]> {
-    let users: User[] = await this.usersRepository.find();
-    if (users.length === 0) {
-      throw new NotFoundException("không tồn tại user nào!");
+  async findAll(email?: string): Promise<UserResponseDto[]> {
+    let users: User[];
+    if (email) {
+      users = await this.usersRepository.find({
+        where: {
+          email: Like(`%${email}%`)
+        }
+      })
+    }
+    else {
+      users = await this.usersRepository.find();
+      if (users.length === 0) {
+        throw new NotFoundException("không tồn tại user nào!");
+      }
     }
     return users.map(user => new UserResponseDto(user.id, user.firstName, user.lastName, user.email, user.isActive, user.roles));
   }
@@ -130,6 +140,7 @@ export class UsersService {
     const userResponse = await this.usersRepository.findOne(
       {
         where: { email },
+
         relations: ['roles']
       });
     await this.cacheManager.set(cacheKey, userResponse, 600000);
@@ -144,10 +155,16 @@ export class UsersService {
     }
     // const updatedUser = await this.usersRepository.update(id, updateUserDto);
 
-    const updatedUser = await this.usersRepository.save({
-      ...user,
-      ...updateUserDto, // key phía sau sẽ ghi dè key phía trước
-    })
+    // ghi đè dữ liệu mới vào instace cũ bằng Object Object.assign
+    // giúp dữ nguyên định dạng "Class Instance" cho biến user
+    Object.assign(user, updateUserDto);
+
+    // const updatedUser = await this.usersRepository.save({
+    //   ...user,
+    //   ...updateUserDto, // key phía sau sẽ ghi dè key phía trước
+    // }) cách này không tự động mã hóa với beforeUpdate
+
+    const updatedUser = await this.usersRepository.save(user);
 
     const userResponse = new UserResponseDto(updatedUser.id, updatedUser.firstName, updatedUser.lastName, updatedUser.email, updatedUser.isActive, updatedUser.roles)
 

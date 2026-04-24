@@ -3,10 +3,11 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, BeforeIn
 import { Role } from 'src/roles/role.entity';
 import * as bcrypt from 'bcrypt';
 
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
   firstName: string;
